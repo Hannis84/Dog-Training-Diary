@@ -1,4 +1,4 @@
-# dog-training-api
+# dog-training-api [![Build Status](https://secure.travis-ci.org/Hannis84/dog-training-api.png?branch=master)](https://travis-ci.org/Hannis84/dog-training-api)
 
 > A Dog Training Diary
 
