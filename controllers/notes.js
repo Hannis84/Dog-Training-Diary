@@ -2,7 +2,8 @@
 var parse = require('co-body');
 var notes = [
   { id: 0, note: 'A fast-paced 30min walk with viivi' },
-  { id: 1, note: 'Agility race 2nd place with viivi' }
+  { id: 1, note: 'Agility race 2nd place with viivi' },
+  { id: 2, note: 'Agility training session 90min with viivi' }
 ];
 
 function *all() {
