@@ -1,23 +1,28 @@
-'use strict';
-var messages = require('./controllers/notes');
-var logger = require('koa-logger');
-var serve = require('koa-static');
-var route = require('koa-route');
-var koa = require('koa');
-var path = require('path');
-var app = module.exports = koa();
+var express = require('express');
+var passport = require('passport');
+var fs = require('fs');
+var mongoose = require('mongoose');
+var config = require('./config/config');
 
-// Logger
-app.use(logger());
+mongoose.connect(config.db);
+var db = mongoose.connection;
+db.on('error', function () {
+  throw new Error('unable to connect to database at ' + config.db);
+});
 
-app.use(route.get('/notes', messages.all));
-app.use(route.get('/notes/:id', messages.fetch));
-app.use(route.post('/notes', messages.create));
+// Initialize mongo models
+var modelsPath = __dirname + '/models';
+fs.readdirSync(modelsPath).forEach(function (file) {
+  if (file.indexOf('.js') >= 0) {
+    require(modelsPath + '/' + file);
+  }
+});
 
-// Serve static files
-app.use(serve(path.join(__dirname, 'public')));
+var app = module.exports = express();
 
-if (!module.parent) {
-  app.listen(3000);
-  console.log('listening on port 3000');
-}
+var auth = require('./config/auth')(passport);
+require('./config/express')(app, config, passport);
+require('./config/routes')(app, auth);
+
+app.listen(config.port);
+console.log('Server started at ' + config.port);
