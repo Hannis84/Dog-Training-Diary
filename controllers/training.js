@@ -1,0 +1,20 @@
+'use strict';
+var mongoose = require('mongoose');
+var Training = mongoose.model('Training');
+
+module.exports.get = function (req, res) {
+  var id = req.user.id;
+  Training.find({userId: id}, function (err, trainings) {
+    if (err) throw err;
+    res.send(trainings);
+  });
+};
+
+module.exports.add = function (req, res) {
+  var id = req.user.id;
+  var training = new Training({userId: id, date: req.body.date, goal: req.body.goal, description: req.body.description})
+  training.save(function (err) {
+    if (err) throw err;
+    res.send(200);
+  });
+};
