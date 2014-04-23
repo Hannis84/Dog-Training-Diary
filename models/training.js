@@ -6,6 +6,7 @@ var Training = new Schema({
   date: String,
   goal: String,
   description: String,
+  glyphicon: String
 });
 
 mongoose.model('Training', Training);

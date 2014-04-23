@@ -12,7 +12,7 @@ module.exports.get = function (req, res) {
 
 module.exports.add = function (req, res) {
   var id = req.user.id;
-  var training = new Training({userId: id, date: req.body.date, goal: req.body.goal, description: req.body.description})
+  var training = new Training({userId: id, date: req.body.date, goal: req.body.goal, description: req.body.description, glyphicon: req.body.glyphicon})
   training.save(function (err) {
     if (err) throw err;
     res.send(200);
