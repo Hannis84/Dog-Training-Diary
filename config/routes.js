@@ -25,6 +25,7 @@ module.exports = function (app, auth) {
   });
 
   app.get('/trainings', auth.authenticated, training.get);
+  app.get('/trainings/:id', auth.authenticated, training.getById);
   app.post('/trainings', auth.authenticated, training.add);
   app.get('/dogs', auth.authenticated, dog.get);
   app.post('/dogs', auth.authenticated, dog.add);
