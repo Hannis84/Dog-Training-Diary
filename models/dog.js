@@ -7,7 +7,8 @@ var Dog = new Schema({
   name: String,
   fullname: String,
   breed: String,
-  breeder: String
+  breeder: String,
+  sports: []
 });
 
 mongoose.model('Dog', Dog);

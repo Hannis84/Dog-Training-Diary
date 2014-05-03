@@ -80,7 +80,8 @@ function create(req, imageId, cb) {
     name: req.body.name,
     fullname: req.body.fullname,
     breed: req.body.breed,
-    breeder: req.body.breeder
+    breeder: req.body.breeder,
+    sports: [].concat(req.body.sports)
   });
 
   dog.save(function (err) {
