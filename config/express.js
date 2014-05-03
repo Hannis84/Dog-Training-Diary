@@ -13,6 +13,7 @@ module.exports = function(app, config, passport) {
     app.use(express.json());
     app.use(express.urlencoded());
     app.use(express.methodOverride());
+    app.use(express.multipart());
     app.use(passport.initialize());
     app.use(passport.session());
     app.use(app.router);
