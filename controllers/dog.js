@@ -17,11 +17,13 @@ module.exports.get = function (req, res) {
       var dogObject = dog.toObject();
 
       if (dog.imageId !== '') {
+
         Image.findById(dog.imageId, function (err, image) {
           var img = image.toObject();
           dogObject.image = img.content;
           cb(err, dogObject);
         });
+
       } else {
         cb(null, dogObject);
       }
@@ -35,31 +37,35 @@ module.exports.get = function (req, res) {
   });
 };
 
+module.exports.getById = function (req, res) {
+  var id = req.params.id;
+
+  Dog.findById(id, function (err, dog) {
+    if (err) throw err;
+
+    if (dog.imageId !== '') {
+      var dogObject = dog.toObject();
+
+      Image.findById(dog.imageId, function (err, image) {
+          var img = image.toObject();
+          dogObject.image = img.content;
+          res.send(dogObject);
+      });
+
+    } else {
+      res.send(dog);
+    }
+  });
+};
+
 module.exports.add = function (req, res) {
   var file = req.files.image;
   if (file) {
-    fs.readFile(file.path, function(err, data) {
-      if (err) throw err;
-
-      var image = new Image({
-        name: file.name,
-        type: file.type,
-        content: data,
-        userId: req.user.id
+    createImage(file, req.user.id, function (imageId) {
+      create(req, imageId, function () {
+        res.send(200);
       });
-
-      image.save(function (err, image) {
-        if (err) throw err;
-
-        create(req, image._id.toString(), function () {
-          res.send(200);
-        });
-      });
-
-      fs.unlink(file.path, function (err) {
-        if (err) throw err;
-      });
-    });
+    })
 
   } else {
     create(req, function () {
@@ -67,6 +73,46 @@ module.exports.add = function (req, res) {
     });
   }
 };
+
+module.exports.edit = function (req, res) {
+  var id = req.params.id;
+  var file = req.files.image;
+  if (file) {
+    createImage(file, req.user.id, function (imageId) {
+      update(id, req, imageId, function () {
+        res.send(200);
+      });
+    })
+
+  } else {
+    update(id, req, function () {
+      res.send(200);
+    });
+  }
+};
+
+function createImage(file, userId, cb) {
+  fs.readFile(file.path, function(err, data) {
+    if (err) throw err;
+
+    var image = new Image({
+      name: file.name,
+      type: file.type,
+      content: data,
+      userId: userId
+    });
+
+    image.save(function (err, image) {
+      if (err) throw err;
+
+      cb(image._id.toString());
+    });
+
+    fs.unlink(file.path, function (err) {
+      if (err) throw err;
+    });
+  });
+}
 
 function create(req, imageId, cb) {
   if ("function" == typeof imageId) {
@@ -87,5 +133,26 @@ function create(req, imageId, cb) {
   dog.save(function (err) {
     if (err) throw err;
     cb();
+  });
+}
+
+function update(id, req, imageId, cb) {
+  if ("function" == typeof imageId) {
+    cb = imageId;
+    imageId = null;
+  }
+
+  Dog.findById(id, function (err, dog) {
+    if (imageId) dog.imageId = imageId;
+    dog.name = req.body.name;
+    dog.fullname = req.body.fullname;
+    dog.breed = req.body.breed;
+    dog.breeder = req.body.breeder;
+    dog.sports = [].concat(req.body.sports);
+
+    dog.save(function (err) {
+      if (err) throw err;
+      cb();
+    });
   });
 }
