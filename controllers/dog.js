@@ -1,11 +1,12 @@
 'use strict';
 
-var fs = require('fs');
 var async = require('async');
 
 var mongoose = require('mongoose');
 var Dog = mongoose.model('Dog');
 var Image = mongoose.model('Image');
+
+var createImage = require('../helpers/image');
 
 module.exports.get = function (req, res) {
   var id = req.user.id;
@@ -19,6 +20,7 @@ module.exports.get = function (req, res) {
       if (dog.imageId !== '') {
 
         Image.findById(dog.imageId, function (err, image) {
+          if (err) throw err;
           var img = image.toObject();
           dogObject.image = img.content;
           cb(err, dogObject);
@@ -47,9 +49,10 @@ module.exports.getById = function (req, res) {
       var dogObject = dog.toObject();
 
       Image.findById(dog.imageId, function (err, image) {
-          var img = image.toObject();
-          dogObject.image = img.content;
-          res.send(dogObject);
+        if (err) throw err;
+        var img = image.toObject();
+        dogObject.image = img.content;
+        res.send(dogObject);
       });
 
     } else {
@@ -90,29 +93,6 @@ module.exports.edit = function (req, res) {
     });
   }
 };
-
-function createImage(file, userId, cb) {
-  fs.readFile(file.path, function(err, data) {
-    if (err) throw err;
-
-    var image = new Image({
-      name: file.name,
-      type: file.type,
-      content: data,
-      userId: userId
-    });
-
-    image.save(function (err, image) {
-      if (err) throw err;
-
-      cb(image._id.toString());
-    });
-
-    fs.unlink(file.path, function (err) {
-      if (err) throw err;
-    });
-  });
-}
 
 function create(req, imageId, cb) {
   if ("function" == typeof imageId) {
