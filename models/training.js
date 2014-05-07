@@ -8,7 +8,8 @@ var Training = new Schema({
   goal: String,
   description: String,
   type: String,
-  dogId: String
+  dogId: String,
+  result: String
 });
 
 mongoose.model('Training', Training);
