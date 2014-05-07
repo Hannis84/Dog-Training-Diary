@@ -22,7 +22,12 @@ module.exports.get = function (req, res) {
 
         Dog.findById(training.dogId, function (err, dog) {
           if (err) throw err;
-          trainingObject.dog = dog.toObject().name;
+          console.log(dog)
+          if (dog) {
+            trainingObject.dog = dog.toObject().name;
+          } else {
+            trainingObject.dog = '';
+          }
           cb(err, trainingObject);
         });
 
