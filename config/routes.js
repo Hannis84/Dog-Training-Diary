@@ -28,7 +28,8 @@ module.exports = function (app, auth) {
   app.get('/trainings/:id', auth.authenticated, training.getById);
   app.post('/trainings', auth.authenticated, training.add);
   app.put('/trainings/:id', auth.authenticated, training.edit);
-  
+  app.delete('/trainings/:id', auth.authenticated, training.delete);
+
   app.get('/dogs', auth.authenticated, dog.get);
   app.get('/dogs/:id', auth.authenticated, dog.getById);
   app.post('/dogs', auth.authenticated, dog.add);

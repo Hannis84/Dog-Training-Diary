@@ -95,6 +95,14 @@ module.exports.edit = function (req, res) {
   }
 };
 
+module.exports.delete = function (req, res) {
+  var id = req.params.id;
+  Training.remove({_id: id}, function (err) {
+    if (err) throw err;
+    res.send(200);
+  });
+}
+
 function create(req, imageId, cb) {
   if ("function" == typeof imageId) {
     cb = imageId;
