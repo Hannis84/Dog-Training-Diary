@@ -7,7 +7,8 @@ var Training = new Schema({
   date: String,
   goal: String,
   description: String,
-  type: String
+  type: String,
+  dogId: String
 });
 
 mongoose.model('Training', Training);

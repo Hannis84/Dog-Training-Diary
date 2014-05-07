@@ -5,6 +5,7 @@ var async = require('async');
 var mongoose = require('mongoose');
 var Training = mongoose.model('Training');
 var Image = mongoose.model('Image');
+var Dog = mongoose.model('Dog');
 
 var createImage = require('../helpers/image');
 
@@ -17,12 +18,11 @@ module.exports.get = function (req, res) {
     async.map(trainings, function (training, cb) {
       var trainingObject = training.toObject();
 
-      if (training.imageId !== '') {
+      if (training.dogId !== '') {
 
-        Image.findById(training.imageId, function (err, image) {
+        Dog.findById(training.dogId, function (err, dog) {
           if (err) throw err;
-          var img = image.toObject();
-          trainingObject.image = img.content;
+          trainingObject.dog = dog.toObject().name;
           cb(err, trainingObject);
         });
 
@@ -51,8 +51,17 @@ module.exports.getById = function (req, res) {
       Image.findById(training.imageId, function (err, image) {
         if (err) throw err;
         var img = image.toObject();
+
         trainingObject.image = img.content;
-        res.send(trainingObject);
+
+        if (training.dogId !== '') {
+          Dog.findById(training.dogId, function (err, dog) {
+            trainingObject.dog = dog.toObject();
+            res.send(trainingObject);
+          });
+        } else {
+          res.send(trainingObject);
+        }
       });
 
     } else {
@@ -115,7 +124,8 @@ function create(req, imageId, cb) {
     date: req.body.date,
     goal: req.body.goal,
     description: req.body.description,
-    type: req.body.type
+    type: req.body.type,
+    dogId: req.body.dog || ''
   });
 
   training.save(function (err) {
@@ -136,6 +146,7 @@ function update(id, req, imageId, cb) {
     training.goal = req.body.goal;
     training.description = req.body.description;
     training.type = req.body.type;
+    training.dogId = req.body.dog || '';
 
     training.save(function (err) {
       if (err) throw err;
