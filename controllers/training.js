@@ -22,7 +22,6 @@ module.exports.get = function (req, res) {
 
         Dog.findById(training.dogId, function (err, dog) {
           if (err) throw err;
-          console.log(dog)
           if (dog) {
             trainingObject.dog = dog.toObject().name;
           } else {
@@ -103,8 +102,8 @@ module.exports.edit = function (req, res) {
     })
 
   } else {
-    update(id, req, function () {
-      res.send(200);
+    update(id, req, function (status) {
+      res.send(status);
     });
   }
 };
@@ -146,16 +145,20 @@ function update(id, req, imageId, cb) {
   }
 
   Training.findById(id, function (err, training) {
-    if (imageId) training.imageId = imageId;
-    training.date = req.body.date;
-    training.goal = req.body.goal;
-    training.description = req.body.description;
-    training.type = req.body.type;
-    training.dogId = req.body.dog || '';
+    if (training.userId === req.user.id) {
+      if (imageId) training.imageId = imageId;
+      training.date = req.body.date;
+      training.goal = req.body.goal;
+      training.description = req.body.description;
+      training.type = req.body.type;
+      training.dogId = req.body.dog || '';
 
-    training.save(function (err) {
-      if (err) throw err;
-      cb();
-    });
+      training.save(function (err) {
+        if (err) throw err;
+        cb(200);
+      });
+    } else {
+      cb(401);
+    }
   });
 }
