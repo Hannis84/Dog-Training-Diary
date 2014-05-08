@@ -6,6 +6,7 @@ var mongoose = require('mongoose');
 var Training = mongoose.model('Training');
 var Image = mongoose.model('Image');
 var Dog = mongoose.model('Dog');
+var Result = mongoose.model('Result');
 
 var createImage = require('../helpers/image');
 
@@ -114,7 +115,43 @@ module.exports.delete = function (req, res) {
     if (err) throw err;
     res.send(200);
   });
+};
+
+function saveResult(result, training, res) {
+  result.save(function (err) {
+    if (err) throw err;
+    training.results = result._id;
+    training.save(function (err) {
+      if (err) throw err;
+      res.send(200);
+    });
+  });
 }
+
+module.exports.results = function (req, res) {
+  var result = new Result({
+    archieved: req.body.archieved,
+    positive: req.body.positive.filter(function (result) {return result !== '';}),
+    negative: req.body.negative.filter(function (result) {return result !== '';}),
+    mood: req.body.mood || ''
+  });
+
+  Training.findById(req.params.id, function (err, training) {
+    if (err) throw err;
+    if (!training) return res.send(404);
+    if (training.userId !== req.user.id) return res.send(401);
+
+    if (training.results) {
+      console.log('remove');
+      Result.remove({_id: training.results}, function (err) {
+        if (err) throw err;
+        saveResult(result, training, res);
+      });
+    } else {
+      saveResult(result, training, res);
+    }
+  });
+};
 
 function create(req, imageId, cb) {
   if ("function" == typeof imageId) {

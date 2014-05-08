@@ -3,8 +3,9 @@ var Schema = mongoose.Schema;
 
 var Result = new Schema({
   goal: String,
-  plus: [String],
-  minus: [String]
+  positive: [String],
+  negative: [String],
+  mood: String
 });
 
 mongoose.model('Result', Result);

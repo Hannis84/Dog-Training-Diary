@@ -9,7 +9,7 @@ var Training = new Schema({
   description: String,
   type: String,
   dogId: String,
-  result: String
+  results: { type: Schema.Types.ObjectId, ref: 'Result' }
 });
 
 mongoose.model('Training', Training);
