@@ -47,31 +47,33 @@ module.exports.get = function (req, res) {
 module.exports.getById = function (req, res) {
   var id = req.params.id;
 
-  Training.findById(id, function (err, training) {
-    if (err) throw err;
+  Training.findById(id)
+    .populate('results')
+    .exec(function (err, training) {
+      if (err) throw err;
 
-    if (training.imageId !== '') {
-      var trainingObject = training.toObject();
+      if (training.imageId !== '') {
+        var trainingObject = training.toObject();
 
-      Image.findById(training.imageId, function (err, image) {
-        if (err) throw err;
-        var img = image.toObject();
+        Image.findById(training.imageId, function (err, image) {
+          if (err) throw err;
+          var img = image.toObject();
 
-        trainingObject.image = img.content;
+          trainingObject.image = img.content;
 
-        if (training.dogId !== '') {
-          Dog.findById(training.dogId, function (err, dog) {
-            trainingObject.dog = dog.toObject();
+          if (training.dogId !== '') {
+            Dog.findById(training.dogId, function (err, dog) {
+              trainingObject.dog = dog.toObject();
+              res.send(trainingObject);
+            });
+          } else {
             res.send(trainingObject);
-          });
-        } else {
-          res.send(trainingObject);
-        }
-      });
+          }
+        });
 
-    } else {
-      res.send(training);
-    }
+      } else {
+        res.send(training);
+      }
   });
 };
 
