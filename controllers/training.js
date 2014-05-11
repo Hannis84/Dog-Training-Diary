@@ -74,9 +74,8 @@ module.exports.getById = function (req, res) {
       } else {
         res.send(training);
       }
-  });
+    });
 };
-
 
 module.exports.add = function (req, res) {
   var file = req.files.image;
@@ -85,7 +84,7 @@ module.exports.add = function (req, res) {
       create(req, imageId, function () {
         res.send(200);
       });
-    })
+    });
 
   } else {
     create(req, function () {
@@ -102,7 +101,7 @@ module.exports.edit = function (req, res) {
       update(id, req, imageId, function () {
         res.send(200);
       });
-    })
+    });
 
   } else {
     update(id, req, function (status) {
@@ -132,9 +131,9 @@ function saveResult(result, training, res) {
 
 module.exports.results = function (req, res) {
   var result = new Result({
-    archieved: req.body.archieved,
-    positive: req.body.positive.filter(function (result) {return result !== '';}),
-    negative: req.body.negative.filter(function (result) {return result !== '';}),
+    goal: req.body.archieved,
+    positive: req.body.positive.filter(function (result) { return result !== ''; }),
+    negative: req.body.negative.filter(function (result) { return result !== ''; }),
     mood: req.body.mood || ''
   });
 
@@ -183,21 +182,33 @@ function update(id, req, imageId, cb) {
     imageId = null;
   }
 
-  Training.findById(id, function (err, training) {
-    if (training.userId === req.user.id) {
-      if (imageId) training.imageId = imageId;
-      training.date = req.body.date;
-      training.goal = req.body.goal;
-      training.description = req.body.description;
-      training.type = req.body.type;
-      training.dogId = req.body.dog || '';
+  Training.findById(id)
+    .populate('results')
+    .exec(function (err, training) {
+      if (training.userId === req.user.id) {
+        if (imageId) training.imageId = imageId;
+        training.date = req.body.date;
+        training.goal = req.body.goal;
+        training.description = req.body.description;
+        training.type = req.body.type;
+        training.dogId = req.body.dog || '';
 
-      training.save(function (err) {
-        if (err) throw err;
-        cb(200);
-      });
-    } else {
-      cb(401);
-    }
+        training.save(function (err) {
+          if (err) throw err;
+
+          var result = training.results;
+          result.goal = req.body.archieved;
+          result.positive = typeof req.body.positive == 'object' ? req.body.positive.filter(function (result) { return result !== ''; }) : req.body.positive;
+          result.negative = typeof req.body.negative == 'object' ? req.body.negative.filter(function (result) { return result !== ''; }) : req.body.negative;
+          result.mood = req.body.mood || '';
+          result.save(function (err) {
+            if (err) throw err;
+            cb(200);
+          });
+        });
+
+      } else {
+        cb(401);
+      }
   });
 }
