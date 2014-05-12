@@ -64,7 +64,20 @@ module.exports.getById = function (req, res) {
           if (training.dogId !== '') {
             Dog.findById(training.dogId, function (err, dog) {
               trainingObject.dog = dog.toObject();
-              res.send(trainingObject);
+
+              if (dog.imageId !== '') {
+
+                Image.findById(dog.imageId, function (err, image) {
+                  if (err) throw err;
+                  var img = image.toObject();
+                  trainingObject.dog.image = img.content;
+                  res.send(trainingObject);
+                });
+
+              } else {
+                res.send(trainingObject);
+              }
+
             });
           } else {
             res.send(trainingObject);
