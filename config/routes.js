@@ -35,4 +35,6 @@ module.exports = function (app, auth) {
   app.get('/dogs/:id', auth.authenticated, dog.getById);
   app.post('/dogs', auth.authenticated, dog.add);
   app.put('/dogs/:id', auth.authenticated, dog.edit);
+  
+  app.get('/profile', auth.authenticated, user.get);
 };
