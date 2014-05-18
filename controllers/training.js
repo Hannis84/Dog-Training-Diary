@@ -204,20 +204,24 @@ function update(id, req, imageId, cb) {
         training.goal = req.body.goal;
         training.description = req.body.description;
         training.type = req.body.type;
-        training.dogId = req.body.dog || '';
+        training.dogId = req.body.dog || training.dogId;
 
         training.save(function (err) {
           if (err) throw err;
 
-          var result = training.results;
-          result.goal = req.body.archieved;
-          result.positive = typeof req.body.positive == 'object' ? req.body.positive.filter(function (result) { return result !== ''; }) : req.body.positive;
-          result.negative = typeof req.body.negative == 'object' ? req.body.negative.filter(function (result) { return result !== ''; }) : req.body.negative;
-          result.mood = req.body.mood || '';
-          result.save(function (err) {
-            if (err) throw err;
+          if ("undefined" !== typeof req.body.archieved) {
+            var result = training.results;
+            result.goal = req.body.archieved;
+            result.positive = typeof req.body.positive == 'object' ? req.body.positive.filter(function (result) { return result !== ''; }) : req.body.positive;
+            result.negative = typeof req.body.negative == 'object' ? req.body.negative.filter(function (result) { return result !== ''; }) : req.body.negative;
+            result.mood = req.body.mood || '';
+            result.save(function (err) {
+              if (err) throw err;
+              cb(200);
+            });
+          } else {
             cb(200);
-          });
+          }
         });
 
       } else {
