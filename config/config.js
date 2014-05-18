@@ -28,7 +28,7 @@ var config = {
       name: 'dog-api'
     },
     port: port,
-    db: 'mongodb://localhost/dog'
+    db: process.env.MONGOHQ_URL
   }
 };
 
