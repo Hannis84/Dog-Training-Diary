@@ -4,15 +4,23 @@
 
 ## Install
 
-Install with [npm](https://npmjs.org).
+1. Start by installing MongoDB
+
+- [Linux](http://docs.mongodb.org/manual/administration/install-on-linux/)
+- [OS X](http://docs.mongodb.org/manual/tutorial/install-mongodb-on-os-x/)
+- [Windows](http://docs.mongodb.org/manual/tutorial/install-mongodb-on-windows/)
+
+Create database called "dog"
+
+2. Next install latest stable [Node.js](http://nodejs.org/download/)
+
+3. Download dependencies from [npm](https://npmjs.org).
 
 ```
 $ npm install
 ```
 
 ## Start
-
-Requires NodeJS >= v0.11.3
 
 ```
 npm start
